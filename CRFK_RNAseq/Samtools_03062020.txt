@@ -1,0 +1,116 @@
+##using samtools faidx to extract ensembl11.1 Sscrofa in5-in8 of PAH
+
+
+[eak37@login0b ~]$ srun -n1 -t02:00:00 --pty bash
+[eak37@n412 SscrofaSus_v11.1.98]$ module load gcc/8.2.0
+[eak37@n412 SscrofaSus_v11.1.98]$ module load samtools/1.9
+[eak37@n412 SscrofaSus_v11.1.98]$ pwd
+/bgfs/rnicholls/REFGenomes/SscrofaSus_v11.1.98
+[eak37@n412 SscrofaSus_v11.1.98]$ ls -lthF
+total 2.2G
+-rw-rw----+ 1 eak37 rnicholls 1.2M Dec  6 08:45 Sus_scrofa.Sscrofa11.98.sorted.gtf.idx
+-rw-rw----+ 1 eak37 rnicholls 528M Dec  6 08:44 Sus_scrofa.Sscrofa11.98.sorted.gtf
+-rw-rw----+ 1 eak37 rnicholls  23K Dec  6 08:31 Sus_scrofa.Sscrofa11.1.dna.toplevel.fa.fai
+drwxrws---+ 2 eak37 rnicholls   18 Oct 15 07:37 STAR_v98/
+-rw-rw----+ 1 eak37 rnicholls 2.4G Oct 14 17:46 Sus_scrofa.Sscrofa11.1.dna.toplevel.fa
+-rw-rw----+ 1 eak37 rnicholls 528M Oct 14 17:45 Sus_scrofa.Sscrofa11.1.98.gtf
+-rw-rw----+ 1 eak37 rnicholls 718M Oct 14 17:30 Sus_scrofa.Sscrofa11.1.dna.toplevel.fa.gz
+-rw-rw----+ 1 eak37 rnicholls  19M Oct 14 17:27 Sus_scrofa.Sscrofa11.1.98.gtf.gz
+[eak37@n412 SscrofaSus_v11.1.98]$ samtools faidx
+Usage: samtools faidx <file.fa|file.fa.gz> [<reg> [...]]
+Option:
+ -o, --output FILE        Write FASTA to file.
+ -n, --length INT         Length of FASTA sequence line. [60]
+ -c, --continue           Continue after trying to retrieve missing region.
+ -r, --region-file FILE   File of regions.  Format is chr:from-to. One per line.
+ -i, --reverse-complement Reverse complement sequences.
+     --mark-strand TYPE   Add strand indicator to sequence name
+                          TYPE = rc   for /rc on negative strand (default)
+                                 no   for no strand indicator
+                                 sign for (+) / (-)
+                                 custom,<pos>,<neg> for custom indicator
+ -f, --fastq              File and index in FASTQ format.
+ -h, --help               This message.
+
+##so write one liner to extract chromsome reion from intron 5 to start of intron8 (same region as in view finder of IGV SVs)
+samtools faidx -o Sscrofa_11.1_PAHin5in8.fa Sus_scrofa.Sscrofa11.1.dna.toplevel.fa 5:81435000-81445000
+samtools faidx -o Sscrofa_11.1_PAHex1to13.fa Sus_scrofa.Sscrofa11.1.dna.toplevel.fa 5:81384547-81461567
+
+
+
+##a couple of AWK scripts to turn remove linebreaks in fasta file
+awk '/^>/ { print (NR==1 ? "" : RS) $0; next } { printf "%s", $0 } END { printf RS }' file
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' file.fasta
+
+module load bioawk/1.0
+
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' file.fasta
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Sscrofa_11.1_PAHin5in8_copy.fa ##testing
+
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Sscrofa_11.1_PAHin5in8.fa > Sscrofa_11.1_PAHin5in8_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Sscrofa_11.1_PAHex1to13.fa > Sscrofa_11.1_PAHex1to13_noline.txt
+
+##also want to extract sequence from deletion coordinates from each PAH allele identified as SV
+116-1 allele 1:  5:81439023-81440189
+116-1 allele 2:  5:81438943-81443006
+116-1 allele 1:  5:81439021-81440245
+#make new file SscrPAH_SNV.txt
+5:81439023-81440189
+5:81438943-81443006
+5:81439021-81440245
+
+samtools faidx -o Sscrofa_11.1_PAHex6_SNV.fa -r SscrPAH_SNV.txt Sus_scrofa.Sscrofa11.1.dna.toplevel.fa
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Sscrofa_11.1_PAHex6_SNV.fa > Sscrofa_11.1_PAHex6_SNV.fa_noline.txt
+
+##continuation on 3/16/20
+##for cat SNORD115 and SNORD116 extraction
+samtools faidx -o F_catus_6.0_SNORD115.fa -r F_catus_SNORD115.tsv Felis_catus.Felis_catus_9.0.dna.toplevel.fa
+samtools faidx -o F_catus_6.0_SNORD116.fa -r F_catus_SNORD116.tsv Felis_catus.Felis_catus_9.0.dna.toplevel.fa
+
+##also extract genomic location +5kb
+samtools faidx -o Fcatus_SNORD115genomic_B3.fa Felis_catus.Felis_catus_9.0.dna.toplevel.fa B3:24266048-24334573
+samtools faidx -o Fcatus_SNORD116genomic_B2.fa Felis_catus.Felis_catus_9.0.dna.toplevel.fa B2:82764534-82774622
+samtools faidx -o Fcatus_SNORD116genomic_B3.fa Felis_catus.Felis_catus_9.0.dna.toplevel.fa B2:24145613-24177596
+
+##bioawk 1-liner
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' F_catus_6.0_SNORD115.fa > F_catus_6.0_SNORD115.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' F_catus_6.0_SNORD116.fa > F_catus_6.0_SNORD116.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Fcatus_SNORD115genomic_B3.fa > Fcatus_SNORD115genomic_B3.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Fcatus_SNORD116genomic_B2.fa > Fcatus_SNORD116genomic_B2.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' Fcatus_SNORD116genomic_B3.fa > Fcatus_SNORD116genomic_B3.fa_noline.txt
+
+#continuation on 3/19/20 for Sus scrofa SNORD115 and SNORD116
+##for pig SNORD115 and SNORD116 extraction
+## -i option for reversecomplement
+samtools faidx -i -o S_scrofa_6.0_SNORD115.fa -r S_scrofa_SNORD115.tsv Sus_scrofa.Sscrofa11.1.dna.toplevel.fa
+samtools faidx -i -o S_scrofa_6.0_SNORD116.fa -r S_scrofa_SNORD116.tsv Sus_scrofa.Sscrofa11.1.dna.toplevel.fa
+
+##also extract genomic location +5kb
+samtools faidx -i -o S_scrofa_SNORD115genomic_chr1.fa Sus_scrofa.Sscrofa11.1.dna.toplevel.fa 1:142013412-142035591
+samtools faidx -i -o S_scrofa_SNORD116genomic_AEMK02000602.fa Sus_scrofa.Sscrofa11.1.dna.toplevel.fa AEMK02000602.1:1-47239
+
+##bioawk 1-liner
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' S_scrofa_6.0_SNORD115.fa > S_scrofa_6.0_SNORD115.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' S_scrofa_6.0_SNORD116.fa > S_scrofa_6.0_SNORD116.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' S_scrofa_SNORD115genomic_chr1.fa > S_scrofa_SNORD115genomic_chr1.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' S_scrofa_SNORD116genomic_AEMK02000602.fa > S_scrofa_SNORD116genomic_AEMK02000602.fa_noline.txt
+
+##continuation on 3/21 for mouse and rat Snord116
+##extracting Mouse Snord116 sequences
+samtools faidx -i -o M_mus_Snord116.fa -r M_mus_SNORD116.tsv Mus_musculus.GRCm38.dna.primary_assembly.fa
+samtools faidx -i -o M_mus_Snord116_full.fa -r M_mus_SNORD116_full.tsv Mus_musculus.GRCm38.dna.primary_assembly.fa
+
+##bioawk 1-liner to remove spaces
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' M_mus_Snord116.fa > M_mus_Snord116.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' M_mus_Snord116_full.fa > M_mus_Snord116_full.fa_noline.txt
+
+##extracting Rat Snord116 sequences
+samtools faidx -i -o R_nor_Snord116_minus.fa -r R_nor_gtf_Snord116.tsv Rattus_norvegicus.Rnor_6.0.dna.toplevel.fa
+samtools faidx -o R_nor_Snord116_plus.fa -r R_nor_gtf_Snord116.tsv Rattus_norvegicus.Rnor_6.0.dna.toplevel.fa
+
+##bioawk 1-liner to remove spaces
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' R_nor_Snord116_minus.fa > R_nor_Snord116_minus.fa_noline.txt
+bioawk -c fastx '{ gsub(/\n/,"",seq); print ">"$name; print $seq }' R_nor_Snord116_plus.fa > R_nor_Snord116_plus.fa_noline.txt
+
+
+
