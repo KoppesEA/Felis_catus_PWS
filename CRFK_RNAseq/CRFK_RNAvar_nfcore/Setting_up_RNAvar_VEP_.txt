@@ -1,0 +1,49 @@
+
+sudo passwd
+snpEff % sudo ln -sfn /opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk
+
+koppesea@Eriks-MacBook-Pro-2 snpEff % java -Xmx4g -jar snpEff.jar databases | grep "Sscrofa11.1.99"
+Sscrofa11.1.99                                              	Sus_scrofa                                                  	          	                              	[https://snpeff.blob.core.windows.net/databases/v5_2/snpEff_v5_2_Sscrofa11.1.99.zip, https://snpeff.blob.core.windows.net/databases/v5_0/snpEff_v5_0_Sscrofa11.1.99.zip, https://snpeff.blob.core.windows.net/databases/v5_1/snpEff_v5_1_Sscrofa11.1.99.zip]
+koppesea@Eriks-MacBook-Pro-2 snpEff %
+
+git clone https://github.com/Ensembl/ensembl-vep.git
+
+oppesea@Eriks-MacBook-Pro-2 ~ % cd ensembl-vep 
+brew install xz
+
+ln -s /opt/homebrew/Cellar/xz/5.4.6/include/lzma.h /usr/local/include/lzma.h
+brew install autoconf automake
+git clone https://github.com/samtools/htslib.git
+brew install autoconf automake
+./configure
+git submodule update --init --recursive
+./configure
+koppesea@Eriks-MacBook-Pro-2 ensembl-vep % find /opt/homebrew/Cellar/xz -name version.h                                
+
+/opt/homebrew/Cellar/xz/5.4.6/include/lzma/version.h
+make
+
+sudo mkdir /usr/local/include/lzma/
+sudo ln -s /opt/homebrew/Cellar/xz/5.4.6/include/lzma/version.h /usr/local/include/lzma/version.h
+
+brew install cpanminus
+cpanm Bio::Perl
+
+env LD_RUN_PATH=/System/Library/Perl/5.34/darwin-thread-multi-2level/CORE \
+cc -bundle -undefined dynamic_lookup -fstack-protector-strong \
+-o blib/arch/auto/Bio/DB/HTS/Faidx/Faidx.bundle \
+lib/Bio/DB/HTS/Faidx.o \
+-L/Users/koppesea/ensembl-vep/htslib \
+-Wl,-rpath,/Users/koppesea/ensembl-vep/htslib \
+-lhts -lpthread -lz
+
+env LD_RUN_PATH=/System/Library/Perl/5.34/darwin-thread-multi-2level/CORE \
+cc -bundle -undefined dynamic_lookup -fstack-protector-strong \
+-o blib/arch/auto/Bio/DB/HTS/Faidx/Faidx.bundle \
+~/ensembl-vep/lib/Bio/DB/HTS/Faidx.o \
+-L/Users/koppesea/ensembl-vep/htslib \
+-Wl,-rpath,/Users/koppesea/ensembl-vep/htslib \
+-lhts -lpthread -lz
+
+SHA256:F+l2oxgZPVGYDllrI7EDVolYL0+DycUlPwrivQkHVA0.
+
