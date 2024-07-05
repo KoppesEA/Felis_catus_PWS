@@ -1,0 +1,34 @@
+[eak37@htc-n42 Fcat_9.0]$ pwd
+/bgfs/rnicholls/REFGenomes/Fcat_9.0
+REFDIR=/bgfs/rnicholls/REFGenomes/Fcat_9.0
+
+nohup wget -O felis_catus.vcf.gz https://ftp.ensembl.org/pub/release-99/variation/vcf/felis_catus/felis_catus.vcf.gz &
+nohup wget -O felis_catus_incl_consequences.vcf.gz https://ftp.ensembl.org/pub/release-99/variation/vcf/felis_catus/felis_catus_incl_consequences.vcf.gz &
+
+
+# make a tbi index
+module load bcftools/1.15.1
+bcftools index -t felis_catus.vcf.gz # t for .tbi
+bcftools index -t felis_catus_incl_consequences.vcf.gz & # t for .tbi
+
+[eak37@htc-n42 Fcat_9.0]$ ls -lthf *.vcf*
+felis_catus_incl_consequences.vcf.gz  felis_catus_incl_consequences.vcf.gz.tbi  felis_catus.vcf.gz  felis_catus.vcf.gz.tbi
+
+# set nf-core variables
+known_indels	$REFDIR/felis_catus.vcf.gz
+known_indels_tbi	$REFDIR/felis_catus.vcf.gz.tbi
+
+##6/19/2024
+##1. Manually make STAR index
+#have to gunzip .gz fa and gtf files first
+[eak37@htc-n31 Sscrofa_v11.1_v104]$ gunzip -c Sus_scrofa.Sscrofa11.1.dna.toplevel.fa.gz > Sus_scrofa.Sscrofa11.1.dna.toplevel.fa &
+[eak37@htc-n31 Sscrofa_v11.1_v104]$ gunzip -c Sus_scrofa.Sscrofa11.1.104.gtf.gz > Sus_scrofa.Sscrofa11.1.104.gtf &
+
+##2. update json with STAR index and continuation
+  "star_index": "/bgfs/rnicholls/REFGenomes/Sscrofa_v11.1_v104/Sscr11.1v104_STAR",
+  
+  ##note that read length is 125/150bp PE reads (uneven); was not set for STAR in mRNA-seq script and used default (100)
+  
+  Reference is:  Transcriptome analysis of infected Crandell Rees Feline Kidney (CRFK) cells
+by canine parvovirus type 2c Laotian isolates:  S. Vannamahaxay, B. Sornpet, K. Pringproa, P. Patchanee and P. Chuammitri
+Gene, 2022, 
