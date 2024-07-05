@@ -23,21 +23,18 @@ REFDIR=/bgfs/rnicholls/REFGenomes/Fcat_9.0
 
 nextflow run /ihome/crc/install/genomics_nextflow/nf-core-rnavar-1.0.0/workflow \
 	-resume \
-	-name EAK_Fcat_RNAvar \
+	-name EAK_Fcat_RNAvar_run3 \
 	-profile htc \
 	-work-dir $WKDIR/ \
-	--input $WKDIR/RNAvar-nfcore/samplesheet.csv \
+	--input $OUTDIR/samplesheet.csv \
 	--outdir $OUTDIR/ \
 	--email eak37@pitt.edu \
 	--multiqc_title EAK_Fcat9_RNAvar_multiQC \
 	--fasta $REFDIR/Felis_catus.Felis_catus_9.0.dna.toplevel.fa.gz \
 	--gtf $REFDIR/Felis_catus.Felis_catus_9.0.99.gtf.gz \
 	--aligner star \
-	--star_index $REFDIR/STAR \
+	--star_index $REFDIR/STAR_279a \
 	--read_length 150 \
 	--known_indels $REFDIR/felis_catus.vcf.gz \
 	--known_indels_tbi $REFDIR/felis_catus.vcf.gz.tbi \
 	--skip_variantannotation 
-
-##need to set samplesheet correctly
-  "input": "/bgfs/rnicholls/PWS_Sus_2017/RNAvar-nfcore/samplesheet.csv",
