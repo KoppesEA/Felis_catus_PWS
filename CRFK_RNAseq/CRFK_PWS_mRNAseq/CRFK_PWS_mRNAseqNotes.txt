@@ -1,0 +1,10 @@
+Notes on implementing RNA-Seq pipeline locally on macbook pro for Felin PWS project
+Erik Koppes
+9/11/2024
+% brew install fastp
+% fastp --version
+fastp 0.23.4
+
+% brew install star
+% which STAR
+/opt/homebrew/bin/STAR
