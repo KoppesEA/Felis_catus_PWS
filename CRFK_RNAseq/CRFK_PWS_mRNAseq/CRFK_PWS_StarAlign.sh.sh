@@ -35,7 +35,7 @@ for sample in {54..59}; do
     STAR --runThreadN 8 \
          --genomeDir ${index_dir} \
          --readFilesIn ${trim_R1} ${trim_R2} \
-         --readFilesCommand zcat \
+         --readFilesCommand gunzip -c \
          --outFileNamePrefix ${sample_out_dir}/${base_name}_ \
          --outSAMtype BAM SortedByCoordinate \
          --outSAMunmapped Within \
