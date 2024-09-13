@@ -3,7 +3,7 @@
 # Directories
 wkdir="/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq"
 trim_dir="${wkdir}/FastqTrim"
-align_dir="${wkdir}/CRFK_PWS_mRNASeq/StarAlign"
+align_dir="${wkdir}/StarAlign"
 index_dir="${wkdir}/Fcat9_refgenome/STARindex"  # Replace with actual path to STAR genome index
 
 # Log file
@@ -18,10 +18,12 @@ echo "STAR alignment process started at $(date)" > ${log_file}
 # Loop through samples S54 to S59
 for sample in {54..59}; do
     # Construct file names
-    base_name="EK155_S${sample}"
-    trim_R1="${trim_dir}/${base_name}_trimmed_R1.fastq.gz"
-    trim_R2="${trim_dir}/${base_name}_trimmed_R2.fastq.gz"
-    
+    trim_R1="${trim_dir}/EK155_*_S${sample}_trimmed_R1.fastq.gz"
+    trim_R2="${trim_dir}/EK155_*_S${sample}_trimmed_R2.fastq.gz"
+
+# Extract base name for output (basename strips directory and extensions)
+    base_name=$(basename ${trim_R1} _trimmed_R1.fastq.gz)
+       
     # Output directory for this sample
     sample_out_dir="${align_dir}/${base_name}"
     mkdir -p ${sample_out_dir}
