@@ -2,7 +2,7 @@
 
 # Directories
 genome_dir="/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq/Fcat9_refgenome"  # Path to cat genome files
-index_dir="{genome_dir}/STARindex"   # Path for STAR index
+index_dir="${genome_dir}/STARindex"   # Path for STAR index
 
 # Log file
 log_file="${index_dir}/STARindex_generation_log.txt"
@@ -18,7 +18,7 @@ STAR --runMode genomeGenerate \
      --runThreadN 8 \
      --genomeDir ${index_dir} \
      --genomeFastaFiles ${genome_dir}/Felis_catus.Felis_catus_9.0.dna.toplevel.fa \
-     --sjdbGTFfile ${genome_dir}/Felis_catus.Felis_catus_9.0.109.gtf \
+     --sjdbGTFfile ${genome_dir}/Felis_catus.Felis_catus_9.0.112.gtf \
      --genomeSAindexNbases 12 \
      --limitGenomeGenerateRAM 13000000000 \
      >> ${log_file} 2>&1

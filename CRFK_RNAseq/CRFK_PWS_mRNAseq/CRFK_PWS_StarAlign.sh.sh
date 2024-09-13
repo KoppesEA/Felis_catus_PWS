@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Directories
-trim_dir="/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq/FastqTrim"
-align_dir="/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq/StarAlign"
-index_dir="/path/to/star/index"  # Replace with actual path to STAR genome index
+wkdir="/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq"
+trim_dir="${wkdir}/FastqTrim"
+align_dir="${wkdir}/CRFK_PWS_mRNASeq/StarAlign"
+index_dir="${wkdir}/Fcat9_refgenome/STARindex"  # Replace with actual path to STAR genome index
 
 # Log file
 log_file="${align_dir}/alignment_log.txt"
@@ -29,7 +30,7 @@ for sample in {54..59}; do
     echo "Aligning ${base_name} started at $(date)" >> ${log_file}
     
     # Run STAR alignment
-    STAR --runThreadN 4 \
+    STAR --runThreadN 8 \
          --genomeDir ${index_dir} \
          --readFilesIn ${trim_R1} ${trim_R2} \
          --readFilesCommand zcat \
