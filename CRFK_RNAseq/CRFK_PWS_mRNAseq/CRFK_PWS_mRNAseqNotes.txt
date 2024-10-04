@@ -5,6 +5,108 @@ Erik Koppes
 % fastp --version
 fastp 0.23.4
 
-% brew install star
+% brew install star [this is incorrect]
 % which STAR
 /opt/homebrew/bin/STAR
+
+% pwd
+/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq/Fcat9_refgenome
+
+# Get f catus 9.0 (Fcat9) .fa genome 
+% curl -O https://ftp.ensembl.org/pub/release-112/fasta/felis_catus/dna/Felis_catus.Felis_catus_9.0.dna.toplevel.fa.gz &
+% curl -O https://ftp.ensembl.org/pub/release-112/gtf/felis_catus/Felis_catus.Felis_catus_9.0.112.gtf.gz &
+
+% gunzip -c Felis_catus.Felis_catus_9.0.112.gtf.gz > Felis_catus.Felis_catus_9.0.112.gtf &
+% gunzip -c Felis_catus.Felis_catus_9.0.dna.toplevel.fa.gz > Felis_catus.Felis_catus_9.0.dna.toplevel.fa &
+
+#check how many cores on my m1 mac to optimze genome gen script
+koppesea@Eriks-MBP-2 Fcat9_refgenome % sysctl -n hw.ncpu
+10
+# use 8 leave 2 efficiency for system proccesses
+
+# make starindex dir
+% mkdir STARindex
+
+## had to adjust script as STAR is not STAR-align
+koppesea@Eriks-MBP-2 STARindex % brew list | grep star
+star
+koppesea@Eriks-MBP-2 STARindex % brew install star-align
+brew uninstall star
+brew cleanup
+
+#Download and Install STAR correctly
+#Download
+cd ~/Downloads
+curl -L https://github.com/alexdobin/STAR/archive/2.7.10b.tar.gz -o STAR-2.7.10b.tar.gz
+tar -xzf STAR-2.7.10b.tar.gz
+cd STAR-2.7.10b
+#compile
+cd source
+make STAR
+# move executable to directory
+sudo mv STAR /usr/local/bin/
+STAR --version
+
+## needed to install gcc to compile correctly
+koppesea@Eriks-MBP-2 source % brew install gcc
+gcc --version still shows xcode default
+Apple clang version 15.0.0 (clang-1500.3.9.4)
+Target: arm64-apple-darwin23.6.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+
+koppesea@Eriks-MBP-2 source % gcc-14 --version
+gcc-14 (Homebrew GCC 14.2.0) 14.2.0
+
+koppesea@Eriks-MBP-2 source % brew --prefix gcc
+/opt/homebrew/opt/gcc
+
+#make alias in shell config 
+nano ~/.zprofile
+alias gcc='/opt/homebrew/bin/gcc
+or just change PATH to homebrew
+export PATH="/opt/homebrew/bin:$PATH"
+ctrl O, ctrl x
+/opt/homebrew/opt/gcc
+
+koppesea@Eriks-MBP-2 source % less /etc/profile 
+## seems that /etc/profile somehow messes up the zsh profile
+sudo nano /etc/profile
+
+# Add Homebrew First
+export PATH="/opt/homebrew/bin:$PATH"
+
+# System-wide .profile for sh(1)
+
+if [ -x /usr/libexec/path_helper ]; then
+        eval `/usr/libexec/path_helper -s`
+fi
+
+if [ "${BASH-no}" != "no" ]; then
+        [ -r /etc/bashrc ] && . /etc/bashrc
+fi
+
+source ~/.zprofile
+
+make STARforMacStatic CXX=/usr/local/Cellar/gcc/8.2.0/bin/g++-8
+
+## error
+g++-14: error: unrecognized command-line option '-mavx2'
+# either commen out -mavx2 line 
+CXXFLAGS = -O3 -mcpu=native
+CXXFLAGS_SIMD ?= -mavx2 (line 45)
+
+change lines 48 and 49 adding  -mcpu=apple-m1
+CXXFLAGS_common := -std=c++11 -fopenmp $(COMPTIMEPLACE) $(GIT_BRANCH_COMMIT_DIFF) -mcpu=apple-m1
+CXXFLAGS_main := -O3 $(CXXFLAGS_common) -mcpu=apple-m1
+
+nano Makefile (CTRL + W or F6 search mavx2, alt-W to move forwar, alt-q back)
+
+make STARforMacStatic CXX=/usr/local/Cellar/gcc/8.2.0/bin/g++-8
+works with some warning but no errors
+
+koppesea@Eriks-MBP-2 source % sudo cp STAR /usr/local/bin
+Password:
+koppesea@Eriks-MBP-2 source % which STAR
+/usr/local/bin/STAR
+

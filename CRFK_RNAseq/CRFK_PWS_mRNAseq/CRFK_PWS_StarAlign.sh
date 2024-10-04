@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Directories
-wkdir="/Users/koppesea/Documents/Bioinfx/Bioinformatics_2024/CRFK_PWS_mRNASeq"
+wkdir="/Volumes/DKRIWC_disk2_1tb/DKRIWC_Bioinformatics/Bioinformatics_2024/CRFK_PWS_mRNASeq"
 trim_dir="${wkdir}/FastqTrim"
 align_dir="${wkdir}/StarAlign"
-index_dir="${wkdir}/Fcat9_refgenome/STARindex"  # Replace with actual path to STAR genome index
+index_dir="${wkdir}/Fcat9_refgenome/STARindex" 
 
 # Log file
 log_file="${align_dir}/alignment_log.txt"
@@ -21,7 +21,7 @@ for sample in {54..59}; do
     trim_R1="${trim_dir}/EK155_*_S${sample}_trimmed_R1.fastq.gz"
     trim_R2="${trim_dir}/EK155_*_S${sample}_trimmed_R2.fastq.gz"
 
-# Extract base name for output (basename strips directory and extensions)
+    # Extract base name for output (basename strips directory and extensions)
     base_name=$(basename ${trim_R1} _trimmed_R1.fastq.gz)
        
     # Output directory for this sample
