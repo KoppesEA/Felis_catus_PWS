@@ -8,5 +8,5 @@
 # Input Directories
 ./CRFK_BisPCR_amplicon/ReadAbundance
 ./CRFK_BisPCR_amplicon/AmpliconSeqDownload_SFTP_30-424840508.bash
-
+./CRFK_BisPCR_amplicon/output_png
 .Rproj.user
