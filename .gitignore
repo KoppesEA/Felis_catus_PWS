@@ -1,2 +1,12 @@
+# OSX .DS_Store
 .DS_Store
 **/.DS_Store
+
+# R Project data
+./CRFK_BisPCR_amplicon/*.Rproj
+
+# Input Directories
+./CRFK_BisPCR_amplicon/ReadAbundance
+./CRFK_BisPCR_amplicon/AmpliconSeqDownload_SFTP_30-424840508.bash
+
+.Rproj.user

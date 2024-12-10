@@ -1,12 +1,36 @@
-##script to analyze Cat PWS-IC bisulfite PCR Ampliconseq
+## Erik Koppes, PhD
+## Postdoctoral Associate, RD Nicholls Lab
+## University of Pittsburgh Dept of Genetic and Genomic Medicine
+## Sept 3rd, 2020; Revised December 2024
+## Script to analyze Cat PWS-IC bisulfite PCR Ampliconseq
 
-
+# Load Dependencies
 library(openxlsx)
 library(dplyr)
 library(stringr)
 library(ggplot2)
 
-EK01_import <- read.xlsx("Plate1_abundance.xlsx", sheet = 1)
+# Import "Plate Abundance" files from genewiz that give DNA sequence and # of reads
+# Function to import and process plate abundance data
+import_plate_abundance <- function(file_name, sheet = 1, import_dir = "./ReadAbundance/") {
+  # Construct the file path
+  file_path <- paste0(import_dir, file_name)
+  # Read the Excel file and select required columns
+  abundance_data <- read.xlsx(file_path, sheet = sheet) %>%
+    select(TargetSequence, Reads, AvgQScore, Type, Pct)
+  return(abundance_data)
+}
+
+# Excel Import
+EK01_import <- import_plate_abundance("Plate1_abundance.xlsx", sheet = 1)
+
+
+
+
+importDIR <- "./ReadAbundance/"
+
+EK01_import <- read.xlsx(paste0(importDIR, "Plate1_abundance.xlsx"), sheet = 1) %>%
+  select(TargetSequence, Reads, AvgQScore, Type, Pct)
 
 EK02_import <- read.xlsx("Plate1_abundance.xlsx", sheet = 2)
 

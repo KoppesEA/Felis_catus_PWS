@@ -110,3 +110,29 @@ Password:
 koppesea@Eriks-MBP-2 source % which STAR
 /usr/local/bin/STAR
 
+## weekend of 10/4-6/2024 run star aligner for 6 cat mRNAseq samples, _S58 had to rerun as process interupted (memory?)
+#realized that sjbd intron bp-1 was set to 100 (default) and no 149 as should be expected for 150bp reads
+
+#htseq on MBP
+download miniconda
+https://docs.anaconda.com/miniconda/
+bash Miniconda3-latest-MacOSX-arm64
+#yes to all
+
+pycharm terminal
+echo 'export PATH="~/miniconda3/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+conda --version
+conda 24.7.1
+
+#create conda env in pycharm terminal
+conda create -n htseq_env python=3.9
+conda activate htseq_env
+
+#
+pip install htseq
+
+
+
+
+
