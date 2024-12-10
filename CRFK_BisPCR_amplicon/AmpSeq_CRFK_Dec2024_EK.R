@@ -7,6 +7,7 @@
 # Load Dependencies
 library(openxlsx)
 library(dplyr)
+library(purrr)
 library(stringr)
 library(ggplot2)
 
@@ -23,24 +24,52 @@ import_plate_abundance <- function(file_name, sheet = 1, import_dir = "./ReadAbu
 
 # Excel Import
 EK01_import <- import_plate_abundance("Plate1_abundance.xlsx", sheet = 1)
+EK01_import <- import_plate_abundance("Plate1_abundance.xlsx", sheet = 2)
+EK11_import <- import_plate_abundance("Plate2_abundance.xlsx", sheet = 1)
+EK12_import <- import_plate_abundance("Plate2_abundance.xlsx", sheet = 2)
+EK13_import <- import_plate_abundance("Plate2_abundance.xlsx", sheet = 3)
 
-
-
-
-importDIR <- "./ReadAbundance/"
-
-EK01_import <- read.xlsx(paste0(importDIR, "Plate1_abundance.xlsx"), sheet = 1) %>%
-  select(TargetSequence, Reads, AvgQScore, Type, Pct)
-
-EK02_import <- read.xlsx("Plate1_abundance.xlsx", sheet = 2)
-
-EKCRFK_import <- rbind(EK01_import, EK02_import)
+## Define 23 CpG Dinucleotide positions
 
 meTemplate <- tibble(TargetSequence = "GGAATCGAGAATAATTTTTTTAATATTTTACGTGTTTTAAAAAAGAGAGATTTTGTTATTAAATTTAGGGTGGTGGTGGAGTTTTTAAAAGGCGTTAGCGTTTTGGTTATTTGTAGTGTAGTAGAAATTAGGTTTTAACGATTTCGTTTGGCGGGGGCGTTGGTATTTTTGTATTGCGGTAGGATTTTAGTATTGCGGTAAATAGTTGCGGTTGCGTAGTTAAAGTCGGAGGGGTGGCGAGTTGCGTATGCGTAGGTGGAATTGGTGTGATTAGTTTTGTCGTAGTGATTGGAATATAGAGTGGAGTGGTCGTCGGAGATGTTTGAAGGTTTGTTTTGAGGAGCGGTTAGTAGCGCGATGGAGCGGGTTAGGTTAGTTGTGTGGATGTTTTTTTTTAGAGATAGTTTA"
 ) %>% select(TargetSequence) %>%
   mutate(CG_counts = str_count(TargetSequence, "CG")) %>%
-  mutate(CG_pos = str_locate_all(TargetSequence, "C"))
-meTemplate$CG_pos ##to see the 23 CG positions
+  mutate(CG_pos = str_locate_all(TargetSequence, "CG"))
+meTemplate$CG_pos[[1]][, "start"] ##to see the 23 CG positions
+# Extract all 'start' positions from the first list element
+
+
+# Function to process CG-related data
+process_cg_data <- function(Amplicondata, positions = meTemplate$CG_pos[[1]][, "start"]) {
+  # Process the Amplicondata
+  Amplicondata_counts <- Amplicondata %>%
+    select(TargetSequence, Reads) %>%
+    mutate(
+      CG_counts = str_count(TargetSequence, "CG"), # Use the column directly
+      CG_pos = map(TargetSequence, ~ str_locate_all(.x, "CG")[[1]][, "start"]) # Extract 'start' positions
+    )
+  
+  # Dynamically create the position columns
+  for (pos in positions) {
+    pos_col <- paste0("pos_", sprintf("%03d", pos)) # Format as `pos_XXX`
+    Amplicondata_counts <- Amplicondata_counts %>%
+      mutate(!!pos_col := map_lgl(CG_pos, ~ pos %in% .x)) # Check if the position exists in start positions
+  }
+  
+  return(Amplicondata_counts)
+}
+
+# Example usage:
+EK01_me <- process_cg_data(EK01_import)
+
+
+
+# Example usage:
+EK01_me <- process_cg_data(EK01_import)
+
+
+
+EK01_me$CG_pos
 
 EK01_me <- EK01_import %>% select(TargetSequence) %>%
   mutate(CG_counts = str_count(TargetSequence, "CG")) %>%
