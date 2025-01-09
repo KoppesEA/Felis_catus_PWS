@@ -116,7 +116,7 @@ process_CpG_data <- function(Amplicondata, positions = meTemplate$CG_pos[[1]][, 
         averages < 0.80 ~ "70-80%",
         averages < 0.90 ~ "80-90%",
         averages <= 1.0 ~ "90-100%",
-        TRUE ~ "whoa"
+        TRUE ~ "ERROR"
       )
     )
   
